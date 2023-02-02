@@ -229,9 +229,8 @@ class PauliString:
         # TO COMPLETE (after lecture on mapping)
         new_z_bits = np.logical_xor(self.z_bits,other.z_bits)
         new_x_bits = np.logical_xor(self.x_bits,other.x_bits)
-        #w = (2*np.dot(other.z_bits, self.x_bits) + np.dot(self.z_bits, self.x_bits) + np.dot(other.z_bits, other.x_bits) - np.dot(new_z_bits, new_x_bits)) % 4
-        w = (2*np.dot(other.z_bits, self.x_bits)  - np.dot(new_z_bits, new_x_bits)) % 4
-        
+        w = (2*np.dot(np.array(other.z_bits, dtype=int), np.array(self.x_bits, dtype=int) ) + np.dot(np.array(self.z_bits, dtype=int), np.array(self.x_bits, dtype=int) ) + np.dot(np.array(other.z_bits, dtype=int), np.array(other.x_bits, dtype=int) ) - np.dot(np.array(new_z_bits, dtype=int), np.array(new_x_bits, dtype=int))) % 4
+                
         phase = (-1j)**w 
         
         ################################################################################################################
@@ -711,9 +710,10 @@ class LinearCombinaisonPauliString:
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
         zx_bits = np.array(self.to_zx_bits(),dtype = int)
-        out = np.array([str(l) for l in zx_bits])
+        out = np.array([str(np.flip(l)).strip("[]") for l in zx_bits])
+        #out = np.array(["".join(l) for l in out])
         order = np.argsort(out)
-        print("ordering not working")
+        
        
         #1
         

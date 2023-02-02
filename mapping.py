@@ -88,7 +88,8 @@ class JordanWigner(Mapping):
             z_bits2[i] = True
             
             new_pauli_strings = np.array([PauliString(z_bits1,x_bits), PauliString(z_bits2,x_bits)])
-            new_coefs = np.array([0.5, -0.5j], dtype=complex)
+            new_coefs = np.array([0.5, -0.5*j], dtype=np.complex128)
+            
             creation_operators.append(LinearCombinaisonPauliString(new_coefs,new_pauli_strings))
             annihilation_operators.append(LinearCombinaisonPauliString(np.conj(new_coefs),new_pauli_strings))
         

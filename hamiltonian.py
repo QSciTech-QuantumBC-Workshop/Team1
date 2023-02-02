@@ -181,10 +181,9 @@ class OneBodyFermionicHamiltonian(FermionicHamiltonian):
                 temp_lcps = creation_operators[i]*annihilation_operators[j]
                 new_coefs[4*(i*n_orbs + j):4*(i*n_orbs + j) + 4] =  self.integrals[i,j]*temp_lcps.coefs
                 new_pauli_strings[4*(i*n_orbs + j):4*(i*n_orbs + j) + 4] = temp_lcps.pauli_strings
-                #print(temp_lcps.pauli_strings)
+               
                 
-        #print()       
-       # print(new_pauli_strings)
+        
         lcps = LinearCombinaisonPauliString(new_coefs,new_pauli_strings)
         
             
@@ -272,9 +271,24 @@ class TwoBodyFermionicHamiltonian(FermionicHamiltonian):
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
         # lcps =
+        n3 = n_orbs**3
+        n2 = n_orbs**2
+        for i in range(n_orbs):
+            for j in range(n_orbs):
+                for k in range(n_orbs):
+                    for l in range(n_orbs):
+                        temp_lcps = creation_operators[i]*creation_operators[j]
+                        temp_lcps1 = annihilation_operators[k]*annihilation_operators[l]
+                        temp_lcps = temp_lcps*temp_lcps1
+                        new_coefs[16*(i*n3 + j*n2 + k*n_orbs + l):16*(i*n3 + j*n2 + k*n_orbs + l) + 16] =  0.5*self.integrals[i,j,k,l]*temp_lcps.coefs
+                        new_pauli_strings[16*(i*n3 + j*n2 + k*n_orbs + l):16*(i*n3 + j*n2 + k*n_orbs + l) + 16] = temp_lcps.pauli_strings
+               
+                
+        
+        lcps = LinearCombinaisonPauliString(new_coefs,new_pauli_strings)
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return lcps
         
@@ -458,14 +472,15 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
             LinearCombinaisonPauliString: Qubit operator reprensentation of the MolecularFermionicHamiltonian.
         """     
 
-        out = None
 
         ################################################################################################################
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
+        h1_lcps = self.one_body.to_linear_combinaison_pauli_string(creation_operators, annihilation_operators)
+        h2_lcps = self.two_body.to_linear_combinaison_pauli_string(creation_operators, annihilation_operators)
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
-        return out
+        return h1_lcps + h2_lcps
 
