@@ -76,9 +76,26 @@ class JordanWigner(Mapping):
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
         # This is a large piece of the puzzle
+        for i in range(n_qubits):
+            x_bits = np.zeros((n_qubits), dtype=bool)
+            x_bits[i] = True
+            
+            z_bits1 = np.zeros((n_qubits), dtype=bool)
+            z_bits1[0:i] = np.ones((i), dtype=bool)
+            z_bits1[i] = False
+            z_bits2 = np.zeros((n_qubits), dtype=bool)
+            z_bits2[0:i] = np.ones((i), dtype=bool)
+            z_bits2[i] = True
+            
+            new_pauli_strings = np.array([PauliString(z_bits1,x_bits), PauliString(z_bits2,x_bits)])
+            new_coefs = np.array([0.5, -0.5j], dtype=complex)
+            creation_operators.append(LinearCombinaisonPauliString(new_coefs,new_pauli_strings))
+            annihilation_operators.append(LinearCombinaisonPauliString(np.conj(new_coefs),new_pauli_strings))
+        
+        
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return creation_operators, annihilation_operators
 

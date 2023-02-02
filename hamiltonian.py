@@ -175,9 +175,22 @@ class OneBodyFermionicHamiltonian(FermionicHamiltonian):
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
         # lcps =
+        
+        for i in range(n_orbs):
+            for j in range(n_orbs):
+                temp_lcps = creation_operators[i]*annihilation_operators[j]
+                new_coefs[4*(i*n_orbs + j):4*(i*n_orbs + j) + 4] =  self.integrals[i,j]*temp_lcps.coefs
+                new_pauli_strings[4*(i*n_orbs + j):4*(i*n_orbs + j) + 4] = temp_lcps.pauli_strings
+                #print(temp_lcps.pauli_strings)
+                
+        #print()       
+       # print(new_pauli_strings)
+        lcps = LinearCombinaisonPauliString(new_coefs,new_pauli_strings)
+        
+            
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return lcps
 
