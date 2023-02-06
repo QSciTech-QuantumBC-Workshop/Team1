@@ -141,7 +141,7 @@ class OneBodyFermionicHamiltonian(FermionicHamiltonian):
         # new_integrals =
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return OneBodyFermionicHamiltonian(new_integrals, self.with_spin)
 
@@ -236,7 +236,7 @@ class TwoBodyFermionicHamiltonian(FermionicHamiltonian):
         # new_integrals =
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return TwoBodyFermionicHamiltonian(new_integrals, self.with_spin)
 
@@ -393,7 +393,7 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
         two_body = TwoBodyFermionicHamiltonian(h2_mo)
 
         # Recommended : Make sure that h1_mo is diagonal and that its eigenvalues are sorted in growing order.
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return cls(one_body, two_body)
 
@@ -492,8 +492,6 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
         # TO COMPLETE (after lecture on mapping)
         out = self.two_body.to_linear_combinaison_pauli_string(creation_operators, annihilation_operators) + self.one_body.to_linear_combinaison_pauli_string(creation_operators, annihilation_operators)
         ################################################################################################################
-
-        #raise NotImplementedError()
 
         return out
 
