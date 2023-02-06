@@ -313,15 +313,15 @@ class PauliString:
 		
 		matrix = np.ones((1,1),dtype = np.complex128)
 		
-		for qubit in range(self.len(z_bits)):
+		for qubit in range(len(self.z_bits)):
 			if str(self)[qubit] == 'X':
-				matrix = matrix.kron(X_MAT)
+				matrix = np.kron(matrix, X_MAT)
 			elif str(self)[qubit] == 'Y':
-				matrix = matrix.kron(Y_MAT)
+				matrix = np.kron(matrix, Y_MAT)
 			elif str(self)[qubit] == 'Z':
-				matrix = matrix.kron(Z_MAT)
+				matrix = np.kron(matrix, Z_MAT)
 			else:
-				matrix = matrix.kron(I_MAT)
+				matrix = np.kron(matrix, I_MAT)
 			
 		################################################################################################################
 
@@ -753,9 +753,11 @@ class LinearCombinaisonPauliString:
 		# YOUR CODE HERE (OPTIONAL)
 		# TO COMPLETE (after lecture on mapping)
 		# Hints : sum all the matrices of all PauliStrings weighted by their coef
-		
+		for (pauli_string, coef) in zip(self.pauli_strings, self.coefs):
+			matrix += coef*pauli_string.to_matrix()
+      
 		################################################################################################################
 
-		raise NotImplementedError()
+		#raise NotImplementedError()
 
 		return matrix

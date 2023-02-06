@@ -72,17 +72,25 @@ class ExactSolver(LCPSSolver):
             float, np.array : The lowest eigenvalue and the associated eigenvector.
         """
 
-        eig_value, eig_vector = None
+        eig_value, eig_vector = None, None
 
         ################################################################################################################
         # YOUR CODE HERE (OPTIONAL)
         # TO COMPLETE (after lecture on VQE)
+        hamiltonian_matrix = observable.to_matrix()
+        
+        eig_values, eig_vectors = np.linalg.eigh(hamiltonian_matrix)
+        eig_order = np.argsort(eig_values)
+        eig_values = eig_values[eig_order]
+        eig_vectors = eig_vectors[:,eig_order]
+        
+        eig_value, eig_vector = eig_values[0], eig_vectors[:,0]
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         self.last_opt_params = eig_vector  # store the state vector for retrieval
-        return eig_value
+        return eig_value, eig_vector
 
 
 class VQESolver(LCPSSolver):
