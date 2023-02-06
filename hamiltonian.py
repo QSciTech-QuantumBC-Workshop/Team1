@@ -174,10 +174,20 @@ class OneBodyFermionicHamiltonian(FermionicHamiltonian):
         ################################################################################################################
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
-        # lcps =
+        
+        k = 0
+        for i in range(n_orbs):
+            for j in range(n_orbs):
+                temp = creation_operators[i]*annihilation_operators[j]
+                for pauli_string, coef in zip(temp.pauli_strings, temp.coefs):
+                    new_pauli_strings[k] = pauli_string
+                    new_coefs[k] = coef * self.integrals[i,j] 
+                    k += 1
+
+        lcps = LinearCombinaisonPauliString(new_coefs, new_pauli_strings)
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return lcps
 
@@ -258,10 +268,40 @@ class TwoBodyFermionicHamiltonian(FermionicHamiltonian):
         ################################################################################################################
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
-        # lcps =
+        
+        print(n_orbs)
+        
+        m=0
+        for i in range(0,len(self.integrals)):
+            for j in range(0,len(self.integrals)):
+                for k in range(0,len(self.integrals)):
+                    for l in range(0,len(self.integrals)):
+                        ad_a = creation_operators[i]*creation_operators[j]*annihilation_operators[k]*annihilation_operators[l]
+                        for paulis in ad_a:
+                            new_pauli_strings[m] = paulis.pauli_strings[0]
+                            new_coefs[m] = 0.5*self.integrals[i,j,k,l]*paulis.coefs
+                            m= m+1
+        #print(new_pauli_strings)
+        lcps = LinearCombinaisonPauliString(new_coefs,new_pauli_strings)
+        
+        # k = 0
+        
+        # for i in range(n_orbs):
+        #     for j in range(n_orbs):
+        #         for k in range(n_orbs):
+        #             for l in range(n_orbs):
+        #                 temp_lcps = creation_operators[i]*creation_operators[j]*annihilation_operators[k]*annihilation_operators[l]
+                        
+        #                 for pauli_string, coef in zip(temp_lcps.pauli_strings, temp_lcps.coefs):
+        #                     new_pauli_strings[k] = pauli_string
+        #                     new_coefs[k] = coef * self.integrals[i,j,k,l] * 0.5
+                            
+        #                     k+=1
+                            
+        #lcps = LinearCombinaisonPauliString(new_coefs, new_pauli_strings)
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return lcps
         
@@ -311,7 +351,7 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
 
         return cls(one_body, two_body, with_spin)
 
-    @PendingDeprecationWarning
+    #@PendingDeprecationWarning
     @classmethod
     def from_pyscf_mol(cls, mol) -> 'MolecularFermionicHamiltonian':
         """
@@ -450,9 +490,10 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
         ################################################################################################################
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
+        out = self.two_body.to_linear_combinaison_pauli_string(creation_operators, annihilation_operators) + self.one_body.to_linear_combinaison_pauli_string(creation_operators, annihilation_operators)
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return out
 

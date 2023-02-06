@@ -88,6 +88,8 @@ class Estimator:
         t0 = time.time()
         state_circuit = self.prepare_state_circuit(params)
         circuits = self.assemble_circuits(state_circuit)
+        
+        diagonal_observables = self.diagonal_observables
 
         expectation_value = 0
         ################################################################################################################
@@ -101,10 +103,30 @@ class Estimator:
         # (Optional) record the result with the record object
         # (Optional) monitor the time of execution
         
+        execute_opts = {'shots' : 1024, 'seed_simulator' : 1}
+        job = execute(circuits, backend=self.backend, **execute_opts)
+        result = job.result()
+        
+        for i in range(len(circuits)):
+            counts = result.get_counts()[i]
+            diagonal_pauli_string = diagonal_observables[i].pauli_strings[0]
+            coef = diagonal_observables[i].coefs[0]
+            print(counts)
+            string_expectation_value = coef * self.estimate_diagonal_pauli_string_expectation_value(diagonal_pauli_string, counts)
+            
+            # print(f'diagonal_observable: {diagonal_observables[i]}')
+            # print(f'diagonal_pauli_string: {diagonal_pauli_string}')
+            # print(f'string_expectation_value: {string_expectation_value}')
+            
+            # print()
+            expectation_value += string_expectation_value
+            
+        
+        
         
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         eval_time = time.time()-t0
 
@@ -188,12 +210,11 @@ class Estimator:
         
         for letter, bit in zip(str(diagonal_pauli_string), state):
 
-            if letter == 'Z' and bit == '1':
-                #eigenvalue *= -1**int(bit)
-                eigenvalue *= -1
-            if letter == 'Z' and bit == '0':
-                
-                eigenvalue *= 1
+            if letter == 'Z':
+                if bit == '1':
+                    eigenvalue *= -1
+                if bit == '0':
+                    eigenvalue *= 1
             
      
         ################################################################################################################
@@ -222,6 +243,7 @@ class Estimator:
         # TO COMPLETE (after lecture on VQE)
         
         total_counts = sum(counts.values())
+        
         for state, count in counts.items():
             eigenvalue = Estimator.diagonal_pauli_string_eigenvalue(diagonal_pauli_string, state)
             expectation_value += count * eigenvalue/total_counts

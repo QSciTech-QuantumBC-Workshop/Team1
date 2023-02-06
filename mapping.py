@@ -76,9 +76,29 @@ class JordanWigner(Mapping):
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
         # This is a large piece of the puzzle
+        creation_coefs = np.array([0.5, -0.5j], dtype=complex)
+        annihilation_coefs = np.array([0.5, 0.5j], dtype=complex)
+        
+        for i in range(n_qubits):
+            string1 = 'I'*(n_qubits - i - 1)
+            string2 = 'I'*(n_qubits - i - 1)
+            
+            string1 += 'X'
+            string2 += 'Y'
+            
+            string1 += 'Z'*i
+            string2 += 'Z'*i
+            
+            pauli_string1 = PauliString.from_str(string1)
+            pauli_string2 = PauliString.from_str(string2)
+            
+            creation_operators.append(LinearCombinaisonPauliString(coefs=creation_coefs, pauli_strings=np.array([pauli_string1, pauli_string2])))
+            annihilation_operators.append(LinearCombinaisonPauliString(coefs=annihilation_coefs, pauli_strings=np.array([pauli_string1, pauli_string2])))
+            
+        
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return creation_operators, annihilation_operators
 
