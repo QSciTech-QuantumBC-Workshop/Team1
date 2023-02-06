@@ -111,7 +111,7 @@ class Estimator:
             counts = result.get_counts()[i]
             diagonal_pauli_string = diagonal_observables[i].pauli_strings[0]
             coef = diagonal_observables[i].coefs[0]
-            print(counts)
+            #print(counts)
             string_expectation_value = coef * self.estimate_diagonal_pauli_string_expectation_value(diagonal_pauli_string, counts)
             
             # print(f'diagonal_observable: {diagonal_observables[i]}')
