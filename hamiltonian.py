@@ -325,7 +325,7 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
             TwoBody terms.
         """
 
-        h1_mo = h2_mo = None
+        h1_M0 = h2_M0 = None
 
         ################################################################################################################
         # YOUR CODE HERE
@@ -346,11 +346,26 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
         # TO COMPLETE
         # h1_mo = 
         # h2_mo = 
+         
+        overlap = mol.intor("int1e_ovlp")
+        eig_value_overlap, eig_vector_overlap = np.linalg.eigh(overlap)
+        A0_basis_00 = eig_vector_overlap/np.sqrt(eig_value_overlap[None,:])
+
+        E_A0 = mol.intor("int1e_kin") + mol.intor("int1e_nuc")
+        E_00 = np.einsum('mi,nj,mn->ij', A0_basis_00,A0_basis_00,E_A0)
+        
+        eri = mol.intor("int2e")
+        V_oo = np.einsum('mi,nj,ok,pl,mnop->ijkl',A0_basis_00,A0_basis_00,A0_basis_00,A0_basis_00, eri)
+        eig_value_E_00, eig_vector_E_00 = np.linalg.eigh(E_00)
+        A0M0 = A0_basis_00 @ eig_vector_E_00
+        h1_M0 = np.einsum('mi,nj,mn->ij', A0M0,A0M0,E_A0)
+        h2_M0 = E_M0 = np.einsum('mi,nj,ok,pl,mnop->ijkl',A0M0,A0M0,A0M0,A0M0, eri)
+        h2_M0 = np.einsum('ijkl->iklj',h2_M0)
         ################################################################################################################
 
         # Build the one and two body Hamiltonians
-        one_body = OneBodyFermionicHamiltonian(h1_mo)
-        two_body = TwoBodyFermionicHamiltonian(h2_mo)
+        one_body = OneBodyFermionicHamiltonian(h1_M0)
+        two_body = TwoBodyFermionicHamiltonian(h2_M0)
 
         # Recommended : Make sure that h1_mo is diagonal and that its eigenvalues are sorted in growing order.
         raise NotImplementedError()
