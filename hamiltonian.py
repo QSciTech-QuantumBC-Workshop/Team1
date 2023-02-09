@@ -175,16 +175,16 @@ class OneBodyFermionicHamiltonian(FermionicHamiltonian):
         # YOUR CODE HERE
         # TO COMPLETE (after lecture on mapping)
         
-        k = 0
-        for i in range(n_orbs):
-            for j in range(n_orbs):
-                temp = creation_operators[i]*annihilation_operators[j]
-                for pauli_string, coef in zip(temp.pauli_strings, temp.coefs):
-                    new_pauli_strings[k] = pauli_string
-                    new_coefs[k] = coef * self.integrals[i,j] 
-                    k += 1
-
-        lcps = LinearCombinaisonPauliString(new_coefs, new_pauli_strings)
+        x=0
+        for i in range(0,len(self.integrals[:,0])):
+            for j in range(0,len(self.integrals[0,:])):
+                cr_an= creation_operators[i]*annihilation_operators[j]
+                for paulis in cr_an:
+                    new_pauli_strings[x] = paulis.pauli_strings[0]
+                    new_coefs[x] = self.integrals[i,j]*paulis.coefs
+                    x= x+1
+        #print(new_pauli_strings)
+        lcps = LinearCombinaisonPauliString(new_coefs,new_pauli_strings)
         ################################################################################################################
 
         #raise NotImplementedError()
@@ -271,17 +271,16 @@ class TwoBodyFermionicHamiltonian(FermionicHamiltonian):
         
         print(n_orbs)
         
-        m=0
+        x=0
         for i in range(0,len(self.integrals)):
             for j in range(0,len(self.integrals)):
                 for k in range(0,len(self.integrals)):
                     for l in range(0,len(self.integrals)):
-                        ad_a = creation_operators[i]*creation_operators[j]*annihilation_operators[k]*annihilation_operators[l]
-                        for paulis in ad_a:
-                            new_pauli_strings[m] = paulis.pauli_strings[0]
-                            new_coefs[m] = 0.5*self.integrals[i,j,k,l]*paulis.coefs
-                            m= m+1
-        #print(new_pauli_strings)
+                        cr_an = creation_operators[i]*creation_operators[j]*annihilation_operators[k]*annihilation_operators[l]
+                        for paulis in cr_an:
+                            new_pauli_strings[x] = paulis.pauli_strings[0]
+                            new_coefs[x] = 0.5*self.integrals[i,j,k,l]*paulis.coefs
+                            x= x+1
         lcps = LinearCombinaisonPauliString(new_coefs,new_pauli_strings)
         
         # k = 0
@@ -365,7 +364,7 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
             TwoBody terms.
         """
 
-        h1_mo = h2_mo = None
+        h1_M0 = h2_M0 = None
 
         ################################################################################################################
         # YOUR CODE HERE
@@ -386,11 +385,27 @@ class MolecularFermionicHamiltonian(FermionicHamiltonian):
         # TO COMPLETE
         # h1_mo = 
         # h2_mo = 
+        overlap = mol.intor("int1e_ovlp")
+        eig_value_overlap, eig_vector_overlap = np.linalg.eigh(overlap)
+        A0_basis_00 = eig_vector_overlap/np.sqrt(eig_value_overlap[None,:])
+
+        E_A0 = mol.intor("int1e_kin") + mol.intor("int1e_nuc")
+        E_00 = np.einsum('mi,nj,mn->ij', A0_basis_00,A0_basis_00,E_A0)
+        
+        eri = mol.intor("int2e")
+        V_oo = np.einsum('mi,nj,ok,pl,mnop->ijkl',A0_basis_00,A0_basis_00,A0_basis_00,A0_basis_00, eri)
+        eig_value_E_00, eig_vector_E_00 = np.linalg.eigh(E_00)
+        A0M0 = A0_basis_00 @ eig_vector_E_00
+        h1_M0 = np.einsum('mi,nj,mn->ij', A0M0,A0M0,E_A0)
+        h2_M0 = E_M0 = np.einsum('mi,nj,ok,pl,mnop->ijkl',A0M0,A0M0,A0M0,A0M0, eri)
+        h2_M0 = np.einsum('ijkl->iklj',h2_M0)
+        
+        
         ################################################################################################################
 
         # Build the one and two body Hamiltonians
-        one_body = OneBodyFermionicHamiltonian(h1_mo)
-        two_body = TwoBodyFermionicHamiltonian(h2_mo)
+        one_body = OneBodyFermionicHamiltonian(h1_M0)
+        two_body = TwoBodyFermionicHamiltonian(h2_M0)
 
         # Recommended : Make sure that h1_mo is diagonal and that its eigenvalues are sorted in growing order.
         #raise NotImplementedError()
