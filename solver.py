@@ -49,19 +49,25 @@ class ExactSolver(LCPSSolver):
             np.array, np.array : Eigenvalues and eigenvectors sorted with respect to the eigenvalues.
         """
 
-        eig_values, eig_vectors = None
+        #eig_values, eig_vectors = None
 
         ################################################################################################################
         # YOUR CODE HERE (OPTIONAL)
         # TO COMPLETE (after lecture on VQE)
         # Hint : np.linalg.eigh
+        
+        hamiltonian_matrix = observable.to_matrix()
+        eig_values, eig_vectors = np.linalg.eigh(hamiltonian_matrix)
+        eig_order = np.argsort(eig_values)
+        eig_values = eig_values[eig_order]
+        eig_vectors = eig_vectors[:,eig_order]
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         return eig_values, eig_vectors
 
-    def lowest_eig_value(self, observable: LinearCombinaisonPauliString) -> float:
+    def lowest_eig_value(self, observable: LinearCombinaisonPauliString) -> tuple[float,NDArray]:
         """
         Return lowest eigenvalue and associated eigenvector.
 
@@ -72,17 +78,20 @@ class ExactSolver(LCPSSolver):
             float, np.array : The lowest eigenvalue and the associated eigenvector.
         """
 
-        eig_value, eig_vector = None
+        
 
         ################################################################################################################
         # YOUR CODE HERE (OPTIONAL)
         # TO COMPLETE (after lecture on VQE)
+        eig_values, eig_vectors = self.eig(observable)
+        eig_value = eig_values[0]
+        eig_vector = eig_vectors[:,0]
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         self.last_opt_params = eig_vector  # store the state vector for retrieval
-        return eig_value
+        return eig_value, eig_vector
 
 
 class VQESolver(LCPSSolver):
@@ -125,16 +134,20 @@ class VQESolver(LCPSSolver):
 
         t0 = time.time()
 
-        opt_value, opt_params = None
+        #opt_value, opt_params = None
 
         ################################################################################################################
         # YOUR CODE HERE (OPTIONAL)
         # TO COMPLETE (after lecture on VQE)
+        minimization_result = self.minimizer(self.estimator.eval, self.start_params)
+        opt_params = minimization_result.x
+        opt_value = minimization_result.fun
         ################################################################################################################
 
-        raise NotImplementedError()
+        #raise NotImplementedError()
 
         self.last_minimization_duration = time.time()-t0
         self.last_opt_params = opt_params  # store the parameters of the variationnal circuit.
+        self.last_opt_value = opt_value
         return opt_value
 

@@ -85,11 +85,14 @@ class PauliString:
             LinearCombinaisonPauliString : When other is numeric
         """
         
-        
-        if isinstance(other, (complex, float, int)):
-            return self.mul_coef(other)
+        if isinstance(other, PauliString):
+            return self.mul_pauli_string(other)
         else:
-            return self.mul_pauli_string(other);
+            return self.mul_coef(other)
+#        if isinstance(other, (complex, float, int)):
+#            return self.mul_coef(other)
+#        else:
+#            return self.mul_pauli_string(other);
             
 
     def __rmul__(self, other: Union['PauliString', complex, float, int]) -> Union[tuple['PauliString', float],
@@ -446,6 +449,22 @@ class LinearCombinaisonPauliString:
         """
 
         return self.__mul__(other)
+    
+#    def append(self, other: 'PauliString', coef: complex):
+#        """
+#        Add a PauliString at the end.
+#
+#        Returns:
+#            str: Descriptive string.
+#        """
+#        
+#        if len(other) != self.n_qubits:
+#                raise ValueError('All PauliString must be of same length')
+#        self.n_terms = self.n_terms + 1
+#        
+#
+#        self.coefs = np.append(self.coefs, coef)
+#        self.pauli_strings = np.append(self.pauli_strings, other)
 
     def add_pauli_string_linear_combinaison(self, other: 'LinearCombinaisonPauliString') -> 'LinearCombinaisonPauliString':
         """
@@ -690,10 +709,32 @@ class LinearCombinaisonPauliString:
         # This one can be hard to implement
         # Use to_zx_bits
         # Transform all I into Z and look for unique PauliStrings
+        ps_pure_z = list()
+        coef_pure_z = list()
+        ps_pure_x = list()
+        coef_pure_x = list()
+        ps_pure_y = list()
+        coef_pure_y = list()
+        for i in range(len(self.coefs)):
+            if self.pauli_strings[i].x_bits.sum() == 0:
+                ps_pure_z.append(self.pauli_strings[i])
+                coef_pure_z.append(self.coefs[i])
+            elif self.pauli_strings[i].z_bits.sum() == 0:
+                ps_pure_x.append(self.pauli_strings[i])
+                coef_pure_x.append(self.coefs[i])
+            elif   np.absolute(np.array(self.pauli_strings[i].z_bits, dtype=int)-np.array(self.pauli_strings[i].x_bits, dtype=int)).sum()==0: #np.dot(np.array(self.pauli_strings[i].z_bits, dtype=int),np.array(self.pauli_strings[i].x_bits, dtype=int)) == np.array(self.pauli_strings[i].x_bits, dtype=int).sum():
+                ps_pure_y.append(self.pauli_strings[i])
+                coef_pure_y.append(self.coefs[i])
+            else :
+                cliques.append(LinearCombinaisonPauliString([self.coefs[i]], [self.pauli_strings[i]]))
         ################################################################################################################
-
-        raise NotImplementedError()
-
+        #cliques.append(LinearCombinaisonPauliString(coef_pure_x, ps_pure_x))
+        #cliques.append(LinearCombinaisonPauliString(coef_pure_y, ps_pure_y))
+        cliques.append(LinearCombinaisonPauliString(coef_pure_z, ps_pure_z))
+        
+#        print(len(cliques))
+#        for lcfs in cliques:
+#            print(lcfs)
         return cliques
 
     def sort(self) -> 'LinearCombinaisonPauliString':
@@ -728,6 +769,8 @@ class LinearCombinaisonPauliString:
 
         new_coefs = self.coefs[order]
         new_pauli_strings = self.pauli_strings[order]
+        
+        #self.divide_in_bitwise_commuting_cliques()
 
         return self.__class__(new_coefs, new_pauli_strings)
     
